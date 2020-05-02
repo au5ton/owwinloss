@@ -1,11 +1,11 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a5f7ff8a36e8c32a9a3cf2cb319cba04",
+    "revision": "6dfb54a5048d6a7a92a19d99d726aaae",
     "url": "/owwinloss/index.html"
   },
   {
-    "revision": "9e514a3756c262403661",
-    "url": "/owwinloss/static/css/main.72f21bb8.chunk.css"
+    "revision": "2c9af8af84fe84cbbcc8",
+    "url": "/owwinloss/static/css/main.f127da69.chunk.css"
   },
   {
     "revision": "a5f5cd6923989bb27bf4",
@@ -16,7 +16,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/owwinloss/static/js/2.50ba3b5d.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "9e514a3756c262403661",
+    "revision": "2c9af8af84fe84cbbcc8",
     "url": "/owwinloss/static/js/main.4375c11e.chunk.js"
   },
   {
