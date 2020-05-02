@@ -1,5 +1,5 @@
 {
-  "name": "win-loss",
+  "name": "owwinloss",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,7 +9,8 @@
     "node-sass": "^4.14.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "shortid": "^2.2.15"
   },
   "scripts": {
     "start": "react-scripts start",

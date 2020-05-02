@@ -1,126 +1,87 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Entry from './Entry'
+import { matchResult } from './common'
+import shortid from 'shortid'
 import './App.scss';
 
-const matchResult = (scoreBlue, scoreRed) => {
-  return (scoreBlue == scoreRed) ? 'Tie' : (scoreBlue > scoreRed ? 'Win' : 'Loss')
-}
-
-var MAX_ID = 0;
-const STAGES = ["Ayutthaya", "Black Forest", "Blizzard World", "Busan", "Castillo", "Château Guillard", "Dorado", "Ecopoint: Antarctica", "Eichenwalde", "Hanamura", "Havana", "Hollywood", "Horizon Lunar Colony", "Ilios", "Junkertown", "King's Row", "Lijiang Tower", "Necropolis", "Nepal", "Numbani", "Oasis", "Paris", "Petra", "Rialto", "Route 66", "Temple of Anubis", "Volskaya Industries", "Watchpoint: Gibraltar"]
-
-function Entry(props) {
-  const [stage, setStage] = useState(STAGES[0]);
-  const [scoreBlue, setScoreBlue] = useState(0);
-  const [scoreRed, setScoreRed] = useState(0);
-  const [locked, setLocked] = useState(true);
-  const [deleted, setDeleted] = useState(false);
-
-  const handleUpdate = () => {
-    props.onUpdate(props.id, stage, scoreBlue, scoreRed, locked, deleted)
-  }
-
-  const handleStageSelect = (e) => {
-    setStage(e.target.value)
-  }
-
-  const handleLock = (e) => {
-    setLocked(!locked)
-  }
-
-  const handleDeleted = () => {
-    setDeleted(true)
-  }
-
-  const handleScoreBlue = (e) => {
-    setScoreBlue(e.target.value)
-  }
-
-  const handleScoreRed = (e) => {
-    setScoreRed(e.target.value)
-  }
-
-  useEffect(() => {
-    handleUpdate()
-  }, [stage, scoreBlue, scoreRed, locked, deleted])
-
-  if(deleted) {
-    return <></>
-  }
-
-  if(locked) {
-    return (
-      <tr>
-        <td>{stage}</td>
-        <td>{`${scoreBlue} - ${scoreRed}`}</td>
-        <td>{matchResult(scoreBlue, scoreRed)}</td>
-        <td>{new Date(props.added).toLocaleTimeString()}</td>
-        <td><div className="clickable" title="Row locked" onClick={handleLock}>🔒</div></td>
-      </tr>
-    )
-  }
-  else {
-    return (
-      <tr>
-        <td>
-          <select name="stage" onChange={handleStageSelect}>
-            {STAGES.map(e => <option key={e} value={e}>{e}</option>)}
-          </select>
-        </td>
-        <td><input type="number" min={0} value={scoreBlue} onChange={handleScoreBlue} /> - <input type="number" min={0} value={scoreRed} onChange={handleScoreRed} /></td>
-        <td>{matchResult(scoreBlue, scoreRed)}</td>
-        <td>{new Date(props.added).toLocaleTimeString()}</td>
-        <td><div className="clickable" title="Row unlocked" onClick={handleLock}>🔓</div></td>
-        <td><div className="clickable" title="Delete" onClick={handleDeleted}>🗑</div></td>
-      </tr>
-    )
-  }
-
-}
-
-function App() {
+export default function App() {
   const [entries, setEntries] = useState([])
   const [records, setRecords] = useState([])
   const [totalWin, setTotalWin] = useState(0)
   const [totalTie, setTotalTie] = useState(0)
   const [totalLoss, setTotalLoss] = useState(0)
 
+  const [startingSR, setStartingSR] = useState(0)
+  const [endingSR, setEndingSR] = useState(0)
+  const [sessionStarted, setSessionStarted] = useState(new Date())
 
-  const handleUpdate = (key, stage, scoreBlue, scoreRed, locked, deleted) => {
-    const clone = JSON.parse(JSON.stringify(records))
-    const outcome = matchResult(scoreBlue, scoreRed);
+  const handleUpdate = (key, stage, scoreBlue, scoreRed, deleted, endSR, timestamp) => {
+    console.log(key, stage, scoreBlue, scoreRed, deleted, endSR)
+    
+    // If performing a delete operation, take care of it and exit
+    if(deleted) {
+      let idx = records.findIndex(e => e.key === key)
+      records.splice(idx, 1)
+      setRecords(records)
+      console.log('deleted', records)
+    }
+    // if record doesn't exist for this key
+    else if (records.findIndex(e => e.key === key) === -1) {
+      records.push({
+        key: key,
+        matchOutcome: matchResult(scoreBlue, scoreRed),
+        endSR: endSR,
+        timestamp: new Date(timestamp).valueOf()
+      })
+      console.log('pushed', records)
+    }
+    else {
+      // otherwise, modify our record for this key
+      const idx = records.findIndex(e => e.key === key)
+      records[idx].matchOutcome = matchResult(scoreBlue, scoreRed)
+      records[idx].endSR = endSR
+      console.log('in-placed', records)
+    }
 
-    if (outcome === 'Win') clone[key] = 1;
-    if (outcome === 'Tie') clone[key] = 0;
-    if (outcome === 'Loss') clone[key] = -1;
-    if (deleted) clone[key] = null
-
-    setTotalWin(clone.filter(e => e === 1).length)
-    setTotalTie(clone.filter(e => e === 0).length)
-    setTotalLoss(clone.filter(e => e === -1).length)
-
-    setRecords(clone);
-
-    console.log(key, stage, scoreBlue, scoreRed, locked, deleted)
-    console.log(clone)
+    // update state
+    setTotalWin(records.filter(e => e.matchOutcome === 'Win').length)
+    setTotalTie(records.filter(e => e.matchOutcome === 'Tie').length)
+    setTotalLoss(records.filter(e => e.matchOutcome === 'Loss').length)
+    setEndingSR(records.length > 0 ? records[records.length-1].endSR : startingSR)
+    setRecords(records);
   }
 
   const handleClick = (e) => {
+    let latestSR = records.length > 0 ? records[records.length-1].endSR : startingSR
+    let reserved = shortid.generate()
+
     setEntries([
-      <Entry key={MAX_ID + 1} id={MAX_ID + 1} onUpdate={handleUpdate} added={new Date()} />,
-      ...entries
+      ...entries,
+      <Entry key={reserved} id={reserved} onUpdate={handleUpdate} added={new Date()} latestSR={latestSR}/>
     ])
-    MAX_ID++;
+  }
+
+  const handleStartingSR = (e) => {
+    setStartingSR(e.target.value)
+    if(entries.filter(e => e !== null).length === 0) {
+      setEndingSR(e.target.value)
+    }
   }
 
   return (
     <div className="App">
       <header>
-        <h3>Win/Loss</h3>
+        <h4 className="title">Win/Loss</h4>
+        <div className="starting-sr">
+          Starting SR: <input type="number" value={startingSR} onChange={handleStartingSR} />
+        </div>
         <a className="button" onClick={handleClick}>New row</a>
-        <h1>
+        <h1 className="win-loss">
           {`${totalWin} - ${totalLoss}`}
           <span className="ties">{totalTie > 0 ? `, ${totalTie} tie${totalTie > 1 ? 's' : ''}` : ''}</span>
         </h1>
+  <h3 className="sr">{`${endingSR - startingSR >= 0 ? '+' : ''}${endingSR - startingSR} SR`}<span class="small"><br />Page opened @ {sessionStarted.toLocaleTimeString()}</span></h3>
+        
       </header>
       <hr />
       <table>
@@ -129,7 +90,9 @@ function App() {
             <th>Map</th>
             <th>Score</th>
             <th>Win/Loss</th>
+            <th>End SR</th>
             <th>Time added</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -139,5 +102,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
