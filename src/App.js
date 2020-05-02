@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable */
+import React, { useState } from 'react';
 import Entry from './Entry'
 import { matchResult } from './common'
 import shortid from 'shortid'
@@ -13,7 +14,7 @@ export default function App() {
 
   const [startingSR, setStartingSR] = useState(0)
   const [endingSR, setEndingSR] = useState(0)
-  const [sessionStarted, setSessionStarted] = useState(new Date())
+  const [sessionStarted, _] = useState(new Date())
 
   const handleUpdate = (key, stage, scoreBlue, scoreRed, deleted, endSR, timestamp) => {
     console.log(key, stage, scoreBlue, scoreRed, deleted, endSR)
