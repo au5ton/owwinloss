@@ -1,0 +1,57 @@
+
+body {
+  background-color: #282c34;
+  color: white;
+  font-size: calc(10px + 2vmin);
+  padding: 3rem;
+}
+
+.button {
+  background-color: #61DAFB;
+  //background-color: rgba(97, 218, 251, 0.5);
+  color: #333;
+  font-size: 0.75em;
+  font-weight: 700;
+  border-radius: 3px;
+  padding: 0.4em 1em;
+  transition: background-color 100ms, border-color 100ms;
+
+  &:hover {
+    cursor: pointer;
+    border: 0.15em solid #458398;
+    margin: -0.15em;
+  }
+  &:active {
+    background-color: hsl(193, 95%, 58%);
+    border-color: hsl(195, 38%, 43%);
+  }
+}
+
+.clickable {
+  cursor: pointer;
+  transition: transform 100ms;
+  transform: scale(1.0);
+  &:hover {
+    transform: scale(1.25);
+  }
+}
+
+h1 span.ties {
+  font-size: 0.5em;
+}
+
+table {
+  font-size: 0.5em;
+
+  th {
+    padding-right: 2em;
+  }
+}
+
+.App {
+  text-align: left;
+}
+
+.App-link {
+  color: #61dafb;
+}
