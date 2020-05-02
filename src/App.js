@@ -18,9 +18,9 @@ export default function App() {
 
   const handleUpdate = (key, stage, scoreBlue, scoreRed, deleted, endSR, timestamp) => {
     console.log(key, stage, scoreBlue, scoreRed, deleted, endSR)
-    
+
     // If performing a delete operation, take care of it and exit
-    if(deleted) {
+    if (deleted) {
       let idx = records.findIndex(e => e.key === key)
       records.splice(idx, 1)
       setRecords(records)
@@ -48,23 +48,23 @@ export default function App() {
     setTotalWin(records.filter(e => e.matchOutcome === 'Win').length)
     setTotalTie(records.filter(e => e.matchOutcome === 'Tie').length)
     setTotalLoss(records.filter(e => e.matchOutcome === 'Loss').length)
-    setEndingSR(records.length > 0 ? records[records.length-1].endSR : startingSR)
+    setEndingSR(records.length > 0 ? records[records.length - 1].endSR : startingSR)
     setRecords(records);
   }
 
   const handleClick = (e) => {
-    let latestSR = records.length > 0 ? records[records.length-1].endSR : startingSR
+    let latestSR = records.length > 0 ? records[records.length - 1].endSR : startingSR
     let reserved = shortid.generate()
 
     setEntries([
       ...entries,
-      <Entry key={reserved} id={reserved} onUpdate={handleUpdate} added={new Date()} latestSR={latestSR}/>
+      <Entry key={reserved} id={reserved} onUpdate={handleUpdate} added={new Date()} latestSR={latestSR} />
     ])
   }
 
   const handleStartingSR = (e) => {
     setStartingSR(e.target.value)
-    if(entries.filter(e => e !== null).length === 0) {
+    if (entries.filter(e => e !== null).length === 0) {
       setEndingSR(e.target.value)
     }
   }
@@ -81,8 +81,7 @@ export default function App() {
           {`${totalWin} - ${totalLoss}`}
           <span className="ties">{totalTie > 0 ? `, ${totalTie} tie${totalTie > 1 ? 's' : ''}` : ''}</span>
         </h1>
-  <h3 className="sr">{`${endingSR - startingSR >= 0 ? '+' : ''}${endingSR - startingSR} SR`}<span class="small"><br />Page opened @ {sessionStarted.toLocaleTimeString()}</span></h3>
-        
+        <h3 className="sr">{`${endingSR - startingSR >= 0 ? '+' : ''}${endingSR - startingSR} SR`}<span className="small"><br />Page opened @ {sessionStarted.toLocaleTimeString()}</span></h3>
       </header>
       <hr />
       <table>
