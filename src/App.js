@@ -1,8 +1,13 @@
 /* eslint-disable */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Entry from './Entry'
 import { matchResult } from './common'
 import shortid from 'shortid'
+import ReactFrappeChart from 'react-frappe-charts'
+
+import '@cougargrades/raster/raster2-react'
+import '@cougargrades/raster/raster.grid.css'
+
 import './App.scss';
 
 export default function App() {
@@ -15,6 +20,11 @@ export default function App() {
   const [startingSR, setStartingSR] = useState(0)
   const [endingSR, setEndingSR] = useState(0)
   const [sessionStarted, _] = useState(new Date())
+
+  const [chartData, setChartData] = useState({
+    labels: ["Starting SR"],
+    datasets: [{ values: [startingSR] }]
+  })
 
   const handleUpdate = (key, stage, scoreBlue, scoreRed, deleted, endSR, timestamp) => {
     console.log(key, stage, scoreBlue, scoreRed, deleted, endSR)
@@ -30,6 +40,7 @@ export default function App() {
     else if (records.findIndex(e => e.key === key) === -1) {
       records.push({
         key: key,
+        stage: stage,
         matchOutcome: matchResult(scoreBlue, scoreRed),
         endSR: endSR,
         timestamp: new Date(timestamp).valueOf()
@@ -41,8 +52,25 @@ export default function App() {
       const idx = records.findIndex(e => e.key === key)
       records[idx].matchOutcome = matchResult(scoreBlue, scoreRed)
       records[idx].endSR = endSR
+      records[idx].stage = stage
       console.log('in-placed', records)
     }
+
+    setChartData({
+      labels: [
+        'Starting SR',
+        ...(records
+          .sort((a, b) => a.timestamp - b.timestamp)
+          .map(e => e.stage))
+      ],
+      datasets: [{ values: [
+        startingSR,
+        ...(records
+          .sort((a, b) => a.timestamp - b.timestamp)
+          .map(e => e.endSR))
+      ]
+      }]
+    })
 
     // update state
     setTotalWin(records.filter(e => e.matchOutcome === 'Win').length)
@@ -67,21 +95,48 @@ export default function App() {
     if (entries.filter(e => e !== null).length === 0) {
       setEndingSR(e.target.value)
     }
+    setChartData({
+      labels: [
+        'Starting SR',
+        ...(records
+          .sort((a, b) => a.timestamp - b.timestamp)
+          .map(e => e.stage))
+      ],
+      datasets: [{ values: [
+        startingSR,
+        ...(records
+          .sort((a, b) => a.timestamp - b.timestamp)
+          .map(e => e.endSR))
+      ]
+      }]
+    })
   }
 
   return (
     <div className="App">
       <header>
-        <h4 className="title">Win/Loss</h4>
-        <div className="starting-sr">
-          Starting SR: <input type="number" value={startingSR} onChange={handleStartingSR} />
-        </div>
-        <a className="button" onClick={handleClick}>New row</a>
-        <h1 className="win-loss">
-          {`${totalWin} - ${totalLoss}`}
-          <span className="ties">{totalTie > 0 ? `, ${totalTie} tie${totalTie > 1 ? 's' : ''}` : ''}</span>
-        </h1>
-        <h3 className="sr">{`${endingSR - startingSR >= 0 ? '+' : ''}${endingSR - startingSR} SR`}<span className="small"><br />Page opened @ {sessionStarted.toLocaleTimeString()}</span></h3>
+        <r-grid columns={8}>
+          <r-cell span="1-4" span-s="row">
+            <h4 className="title">Win/Loss</h4>
+            <div className="starting-sr">
+              Starting SR: <input type="number" value={startingSR} onChange={handleStartingSR} />
+            </div>
+            <a className="button" onClick={handleClick}>New row</a>
+            <h1 className="win-loss">
+              {`${totalWin} - ${totalLoss}`}
+              <span className="ties">{totalTie > 0 ? `, ${totalTie} tie${totalTie > 1 ? 's' : ''}` : ''}</span>
+            </h1>
+            <h3 className="sr">{`${endingSR - startingSR >= 0 ? '+' : ''}${endingSR - startingSR} SR`}<span className="small"><br />Page opened @ {sessionStarted.toLocaleTimeString()}</span></h3>
+          </r-cell>
+          <r-cell span="5-8" span-s="row">
+            <ReactFrappeChart
+              type="line"
+              colors={["#c213f4"]}
+              height={450}
+              data={chartData}
+            />
+          </r-cell>
+        </r-grid>
       </header>
       <hr />
       <table>
