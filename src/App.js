@@ -119,7 +119,10 @@ export default function App() {
           <r-cell span="1-4" span-s="row">
             <h4 className="title">Win/Loss</h4>
             <div className="starting-sr">
-              Starting SR: <input type="number" value={startingSR} onChange={handleStartingSR} />
+              Starting SR: <input type="number" value={startingSR} onChange={handleStartingSR} /> <br />
+              Role: <select name="role">
+              {['(Not selected)', 'Tank', 'Damage', 'Support'].map(e => <option key={e} value={e}>{e}</option>)}
+              </select>
             </div>
             <a className="button" onClick={handleClick}>New row</a>
             <h1 className="win-loss">
