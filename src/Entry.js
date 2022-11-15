@@ -4,7 +4,7 @@ import { matchResult, STAGES } from './common';
 import './App.scss';
 
 export default function Entry(props) {
-  const [stage, setStage] = useState(STAGES[0])
+  const [stage, setStage] = useState("")
   const [scoreBlue, setScoreBlue] = useState(0)
   const [scoreRed, setScoreRed] = useState(0)
   const [locked, setLocked] = useState(true)
@@ -72,7 +72,7 @@ export default function Entry(props) {
           <select name="stage" onChange={handleStageSelect}>
             {Object.keys(STAGES).map(key => 
               <optgroup key={key} label={key}>
-                {STAGES[key].map(e => <option key={e} value={e}>{e}</option>)}
+                {STAGES[key].map(e => <option key={e} value={e} selected={e == stage}>{e}</option>)}
               </optgroup>)
             }
           </select>
