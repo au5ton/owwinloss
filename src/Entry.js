@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react';
-import { matchResult, STAGES} from './common';
+import { matchResult, STAGES } from './common';
 import './App.scss';
 
 export default function Entry(props) {
@@ -70,7 +70,11 @@ export default function Entry(props) {
       <tr>
         <td>
           <select name="stage" onChange={handleStageSelect}>
-            {STAGES.map(e => <option key={e} value={e}>{e}</option>)}
+            {Object.keys(STAGES).map(key => 
+              <optgroup key={key} label={key}>
+                {STAGES[key].map(e => <option key={e} value={e}>{e}</option>)}
+              </optgroup>)
+            }
           </select>
         </td>
         <td><input type="number" min={0} value={scoreBlue} onChange={handleScoreBlue} /> - <input type="number" min={0} value={scoreRed} onChange={handleScoreRed} /></td>
